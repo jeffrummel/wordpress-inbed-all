@@ -42,6 +42,9 @@ class Inbed {
 
     private $ustream_regex = '/embed\/(schannel)?\/?([0-9]{1,})/';
 
+    private $dailyshow_regex = '/media.mtvnservices.com\/embed\/mgid:arc:video:thedailyshow.com/';
+
+
     public function embed($atts, $content, $tag) {
         /* reset */
         $this->tag = null;
@@ -140,6 +143,9 @@ class Inbed {
                     break;
                 case 'instagram':
                     return '<div class="inbed inbed-image instagram"><iframe src="//instagram.com/p/'.$this->id.'/embed/" frameborder="0" scrolling="no" allowtransparency="true" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                    break;
+                case 'dailyshow':
+                    return '<div class="inbed inbed-video dailyshow"><iframe src="http://media.mtvnservices.com/embed/mgid:arc:video:thedailyshow.com:'.$this->id.'" frameborder="0" scrolling="no" allowtransparency="true" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                     break;
                 case 'vine':
                     $vine_url = 'https://vine.co/v/'.$this->id.'/embed'.'/';
@@ -366,6 +372,12 @@ class Inbed {
                 if(isset($matches[1]))
                     $this->id = $matches[1];
                 break;
+            case 'dailyshow':
+                $matches = array();
+                preg_match($this->dailyshow_regex, $url, $matches);
+                if(isset($matches[2]))
+                    $this->id = $matches[2];
+                break;
             case 'twitter':
                 break;
             case 'gist':
@@ -419,6 +431,7 @@ add_shortcode('video', 'inbed');
 add_shortcode('vimeo', 'inbed');
 add_shortcode('youtube', 'inbed');
 add_shortcode('instagram', 'inbed');
+add_shortcode('dailyshow', 'inbed');
 add_shortcode('soundcloud', 'inbed');
 add_shortcode('vine', 'inbed');
 add_shortcode('wufoo', 'inbed');
