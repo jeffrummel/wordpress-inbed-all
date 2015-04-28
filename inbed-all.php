@@ -3,7 +3,7 @@
 Plugin Name: Inbed All
 Plugin URI: http://github.com/walker/inbed-all
 Description: Embed everything
-Version: 1.0.1
+Version: 1.0.3
 Author: Walker Hamilton
 Author URI: http://walkerhamilton.com/
 */
@@ -101,6 +101,10 @@ class Inbed {
 
         if($this->id && $this->tag) {
             switch($this->tag) {
+                case 'paypal':
+                    if(!isset($button) && isset($value)) { $button = '<button name="submit" type="submit"><span>'.$value.'</span></button>'; } else { $button = '<input type="image" src="'.$button.'">'; }
+                    return '<div class="form-container"><form class="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="hosted_button_id" value="'.$this->id.'">'.$button.'<img border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"></form></div>';
+                    break;
                 case 'ustream':
                     if(isset($width)){$width = ' width="'.$width.'"';} else {$width="";}
                     if(isset($height)){$height = ' height="'.$height.'"';} else {$height="";}
@@ -133,10 +137,60 @@ class Inbed {
                     }
                     break;
                 case 'vimeo':
-                    return '<div class="inbed inbed-video lazyload vimeo"><iframe src="//player.vimeo.com/video/'.$this->id.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                    $get_arr = array();
+                    $get_arr[] = (isset($badge)) ? 'badge=1' : 'badge=0';
+                    if(isset($title))
+                        $get_arr[] = 'title=1';
+                    $get_arr[] = (isset($portrait)) ? 'portrait=1' : 'portrait=0';
+                    if(isset($loop))
+                        $get_arr[] = 'loop=1';
+                    if(isset($player_id) && ctype_alnum($player_id))
+                        $get_arr[] = 'player_id='.$player_id;
+                    if(isset($autoplay))
+                        $get_arr[] = 'autoplay=1';
+                    $get_str = (count($get_arr)>0) ? '?'.implode('&amp;', $get_arr) : '';
+                    return '<div class="inbed inbed-video vimeo"><iframe src="//player.vimeo.com/video/'.$this->id.$get_str.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                     break;
                 case 'youtube':
-                    return '<div class="inbed inbed-video lazyload youtube"><iframe src="//www.youtube.com/embed/'.$this->id.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                    $get_arr = array('modestbranding=1');
+                    if(isset($autohide) && ($autohide==='0'||$autohide==='1'||$autohide==='2'||$autohide===0||$autohide===1||$autohide===2))
+                        $get_arr[] = 'autohide='.$autohide;
+                    if(isset($controls) && ($controls==='0'||$controls==='1'||$controls==='2'||$controls===0||$controls===1||$controls===2))
+                        $get_arr[] = 'controls='.$controls;
+                    if(isset($theme) && ($theme=='dark'||$theme=='light'))
+                        $get_arr[] = 'theme='.$theme;
+                    if(isset($vq)) {
+                        switch($vq) {
+                            case 'small':
+                                $get_arr[] = 'VQ=small';
+                                break;
+                            case 'medium':
+                                $get_arr[] = 'VQ=medium';
+                                break;
+                            case 'large':
+                                $get_arr[] = 'VQ=large';
+                                break;
+                            case '720':
+                            default:
+                                $get_arr[] = 'VQ=HD720';
+                        }
+                    } else if(!isset($hq_off)) {
+                        $get_arr[] = 'VQ=HD720';
+                    }
+                    if(isset($cc))
+                        $get_arr[] = 'cc_load_policy=1';
+                    if(isset($loop))
+                        $get_arr[] = 'loop=1';
+                    $get_arr[] = (isset($showinfo)) ? 'showinfo=1': 'showinfo=0';
+                    if(isset($playsinline))
+                        $get_arr[] = 'playsinline=1';
+                    if(isset($autoplay))
+                        $get_arr[] = 'autoplay=1';
+                    if(!isset($rel))
+                        $get_arr[] = 'rel=0';
+                    $get_arr[] = (isset($annotations)) ? 'iv_load_policy=1' : 'iv_load_policy=3';
+                    $get_str = (count($get_arr)>0) ? '?'.implode('&amp;', $get_arr) : '';
+                    return '<div class="inbed inbed-video youtube"><iframe src="//www.youtube.com/embed/'.$this->id.$get_str.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                     break;
                 case 'ustream':
                     return '<div class="inbed inbed-video lazyload ustream"><iframe src="//www.ustream.tv/embed/'.$this->id.'?v=3&amp;wmode=direct" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
@@ -421,6 +475,7 @@ function inbed($atts=null, $content, $tag) {
 }
 
 add_shortcode('inbed', 'inbed');
+add_shortcode('paypal', 'inbed');
 add_shortcode('kimbia', 'inbed');
 add_shortcode('storify', 'inbed');
 add_shortcode('flickr', 'inbed');
