@@ -42,7 +42,7 @@ class Inbed {
 
     private $ustream_regex = '/embed\/(schannel)?\/?([0-9]{1,})/';
 
-    private $dailyshow_regex = '/media.mtvnservices.com\/embed\/mgid:arc:video:thedailyshow.com/';
+    // private $dailyshow_regex = '/media.mtvnservices.com\/embed\/mgid:arc:video:thedailyshow.com/';
 
 
     public function embed($atts, $content, $tag) {
@@ -104,7 +104,7 @@ class Inbed {
                 case 'ustream':
                     if(isset($width)){$width = ' width="'.$width.'"';} else {$width="";}
                     if(isset($height)){$height = ' height="'.$height.'"';} else {$height="";}
-                    return '<div class="inbed inbed-video ustream"><iframe'.$width.$height.' src="//www.ustream.tv/embed'.$this->id.'?v=3&amp;wmode=direct" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe></div>';
+                    return '<div class="inbed inbed-video lazyload ustream"><iframe'.$width.$height.' src="//www.ustream.tv/embed'.$this->id.'?v=3&amp;wmode=direct" scrolling="no" frameborder="0" style="border: 0px none transparent;"></iframe></div>';
                     break;
                 case 'kimbia':
                     $kimbia_vars = array();
@@ -133,20 +133,20 @@ class Inbed {
                     }
                     break;
                 case 'vimeo':
-                    return '<div class="inbed inbed-video vimeo"><iframe src="//player.vimeo.com/video/'.$this->id.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                    return '<div class="inbed inbed-video lazyload vimeo"><iframe src="//player.vimeo.com/video/'.$this->id.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                     break;
                 case 'youtube':
-                    return '<div class="inbed inbed-video youtube"><iframe src="//www.youtube.com/embed/'.$this->id.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                    return '<div class="inbed inbed-video lazyload youtube"><iframe src="//www.youtube.com/embed/'.$this->id.'" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                     break;
                 case 'ustream':
-                    return '<div class="inbed inbed-video ustream"><iframe src="//www.ustream.tv/embed/'.$this->id.'?v=3&amp;wmode=direct" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                    return '<div class="inbed inbed-video lazyload ustream"><iframe src="//www.ustream.tv/embed/'.$this->id.'?v=3&amp;wmode=direct" scrolling="no" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                     break;
                 case 'instagram':
                     return '<div class="inbed inbed-image instagram"><iframe src="//instagram.com/p/'.$this->id.'/embed/" frameborder="0" scrolling="no" allowtransparency="true" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                     break;
-                case 'dailyshow':
-                    return '<div class="inbed inbed-video dailyshow"><iframe src="http://media.mtvnservices.com/embed/mgid:arc:video:thedailyshow.com:'.$this->id.'" frameborder="0" scrolling="no" allowtransparency="true" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
-                    break;
+                // case 'dailyshow':
+                //     return '<div class="inbed inbed-video lazyload dailyshow"><iframe src="http://media.mtvnservices.com/embed/mgid:arc:video:thedailyshow.com:'.$this->id.'" frameborder="0" scrolling="no" allowtransparency="true" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                //     break;
                 case 'vine':
                     $vine_url = 'https://vine.co/v/'.$this->id.'/embed'.'/';
                     if(isset($method) && ($method=='postcard' || $method=='simple')) {
@@ -157,7 +157,7 @@ class Inbed {
                     if(isset($audio) && $audio=='on') {
                         $vine_url .= '?audio=1';
                     }
-                    return '<div class="inbed inbed-video vine"><iframe class="vine-embed" src="'.$vine_url.'" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8" webkitallowfullscreen mozallowfullscreen allowfullscreen></script></div>';
+                    return '<div class="inbed inbed-video lazyload vine"><iframe class="vine-embed" src="'.$vine_url.'" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8" webkitallowfullscreen mozallowfullscreen allowfullscreen></script></div>';
                     break;
                 case 'soundcloud':
                     $sc_url = 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/'.$this->id.'&amp;';
@@ -255,7 +255,7 @@ class Inbed {
                     return '<div class="inbed inbed-story storify"><div class="storify"><iframe src="'.$this->url.'/embed" frameborder="no" allowtransparency="true"></iframe><script src="'.$this->url.'.js"></script><noscript>[<a href="http:'.$this->url.'" target="_blank">View story on Storify</a>]</noscript></div></div>';
                     break;
                 case 'msnbc':
-                    return '<div class="inbed inbed-video msnbc"><iframe src="'.$this->url.'" scrolling="no" border="no" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
+                    return '<div class="inbed inbed-video lazyload msnbc"><iframe src="'.$this->url.'" scrolling="no" border="no" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div>';
                 case 'twitter':
                     if(isset($conversation) && $conversation=='on')
                         $conversation = '';
@@ -372,12 +372,12 @@ class Inbed {
                 if(isset($matches[1]))
                     $this->id = $matches[1];
                 break;
-            case 'dailyshow':
-                $matches = array();
-                preg_match($this->dailyshow_regex, $url, $matches);
-                if(isset($matches[2]))
-                    $this->id = $matches[2];
-                break;
+            // case 'dailyshow':
+            //     $matches = array();
+            //     preg_match($this->dailyshow_regex, $url, $matches);
+            //     if(isset($matches[2]))
+            //         $this->id = $matches[2];
+            //     break;
             case 'twitter':
                 break;
             case 'gist':
@@ -431,7 +431,7 @@ add_shortcode('video', 'inbed');
 add_shortcode('vimeo', 'inbed');
 add_shortcode('youtube', 'inbed');
 add_shortcode('instagram', 'inbed');
-add_shortcode('dailyshow', 'inbed');
+// add_shortcode('dailyshow', 'inbed');
 add_shortcode('soundcloud', 'inbed');
 add_shortcode('vine', 'inbed');
 add_shortcode('wufoo', 'inbed');
